@@ -9,6 +9,26 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
+  const [message, setMessage] = useState("");
+  const [messageStyle, setMessageStyle] = useState("");
+
+  const messageFormater = (isError = false) => {
+    const color = isError ? "red" : "green";
+
+    return {
+      backgroundColor: "lightgrey",
+      fontSize: 16,
+      padding: "5px",
+      border: `1 px solid ${color}`,
+      color: color,
+    };
+  };
+
+  const messageHandler = (message, isError = false) => {
+    setMessage(message);
+    setMessageStyle(messageFormater(isError));
+    setTimeout(() => setMessage(""), 3000);
+  };
 
   const hook = () => {
     personService.getAll().then((response) => {
@@ -70,7 +90,9 @@ const App = () => {
           setPersons(updatedPersons);
           setNewName("");
           setNewNumber("");
-        });
+          messageHandler(`${newNumber} was added to ${updatedPerson.name}`);
+        })
+        .catch(() => messageHandler("Person already deleted", true));
     } else {
       const newPerson = {
         name: newName,
@@ -81,6 +103,7 @@ const App = () => {
         setPersons(persons.concat(createdPerson));
         setNewName("");
         setNewNumber("");
+        messageHandler(`${createdPerson.name} was created.`);
       });
     }
   };
@@ -99,6 +122,7 @@ const App = () => {
         value={filter}
         handleChange={handleFilter}
       />
+      {message && <div style={messageStyle}>{message}</div>}
       <h2>Add a new</h2>
       <PersonForm
         handleSubmit={addPerson}
