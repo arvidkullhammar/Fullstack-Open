@@ -1,0 +1,2 @@
+DELETE  https://black-dust-1746.fly.dev/api/persons/101
+Content-Type: application/json

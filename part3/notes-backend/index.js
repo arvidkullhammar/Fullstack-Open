@@ -1,5 +1,11 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
+const Note = require("./models/note");
+
+const cors = require("cors");
+app.use(cors());
+app.use(express.static("dist"));
 
 const requestLogger = (request, response, next) => {
   console.log("Method:", request.method);
@@ -38,7 +44,9 @@ app.get("/", (request, response) => {
 });
 
 app.get("/api/notes", (request, response) => {
-  response.json(notes);
+  Note.find({}).then((notes) => {
+    response.json(notes);
+  });
 });
 
 app.get("/api/notes/:id", (req, res) => {
@@ -85,9 +93,19 @@ app.post("/api/notes", (request, response) => {
   response.json(note);
 });
 
+app.put("/api/notes/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const noteIndex = notes.findIndex((note) => note.id === id);
+  if (noteIndex !== -1) {
+    notes[noteIndex] = req.body;
+  }
+  res.json(notes[noteIndex]);
+});
+
 app.use(unknownEndpoint);
 
-const PORT = 3001;
+const PORT = process.env.PORT;
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

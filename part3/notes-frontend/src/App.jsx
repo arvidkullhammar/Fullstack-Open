@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import Note from "./Components/Note";
 import noteService from "./services/notes";
+import Note from "./Components/Note";
 
 const App = () => {
   const [notes, setNotes] = useState([]);
@@ -8,8 +8,8 @@ const App = () => {
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    noteService.getAll().then((initialNotes) => {
-      setNotes(initialNotes);
+    noteService.getAll().then((response) => {
+      setNotes(response.data);
     });
   }, []);
 
@@ -27,18 +27,19 @@ const App = () => {
   };
 
   const toggleImportanceOf = (id) => {
-    const url = `http://localhost:3001/notes/${id}`;
     const note = notes.find((n) => n.id === id);
     const changedNote = { ...note, important: !note.important };
 
     noteService
       .update(id, changedNote)
       .then((returnedNote) => {
-        setNotes(notes.map((note) => (note.id !== id ? note : returnedNote)));
+        const newNotes = notes.map((note) =>
+          note.id !== id ? note : returnedNote
+        );
+        setNotes(newNotes);
       })
       .catch((error) => {
-        alert(`the note '${note.content}' was already deleted from server`);
-        setNotes(notes.filter((n) => n.id !== id));
+        alert(`the note '${note.id}' could not be edited`);
       });
   };
 
@@ -65,6 +66,7 @@ const App = () => {
           />
         ))}
       </ul>
+
       <form onSubmit={addNote}>
         <input value={newNote} onChange={handleNoteChange} />
         <button type="submit">save</button>
