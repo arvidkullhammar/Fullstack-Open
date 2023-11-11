@@ -113,6 +113,41 @@ describe('Deletion of a blog', () => {
   })
 })
 
+describe('Creation of a user', () => {
+  test('Fails with statuscode 400 if username is too short', async () => {
+    const userWithShortUsername = {
+      username: 'Te',
+      Name: 'Test',
+      password: 'Test123',
+    }
+
+    const errorResponse = await api
+      .post('/api/users')
+      .send(userWithShortUsername)
+      .expect(400)
+    const contents = errorResponse.body
+    expect(contents.error).toBe(
+      'User validation failed: username: Path `username` (`Te`) is shorter than the minimum allowed length (3).'
+    )
+  })
+  test('Fails with statuscode 400 if password is too short', async () => {
+    const userWithShortPassword = {
+      username: 'Test',
+      Name: 'Test',
+      password: 'Te',
+    }
+    const errorResponse = await api
+      .post('/api/users')
+      .send(userWithShortPassword)
+      .expect(400)
+
+    const contents = errorResponse.body
+
+    //fortsätt här
+    expect(contents.error).toBe('Password should have 3 letters or more')
+  })
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })

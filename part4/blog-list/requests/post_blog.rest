@@ -1,8 +1,9 @@
 POST http://localhost:3001/api/blogs
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlNwYXJ2MSIsImlkIjoiNjU0M2U5NjVmYmNmNzgyZmY1NjViNTE4IiwiaWF0IjoxNjk5Mjk2NDQ5fQ.9ojV5LXNdKrs-SumN3H7WETqX5Tzh-EFH3nefuL-gr4
 
 {
-"title":"Testing is hard",
 "author":"Arvid",
-"likes":3
+"title":"With token monday 5",
+"url":"testurl"
 }
