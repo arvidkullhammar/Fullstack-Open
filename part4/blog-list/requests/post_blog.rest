@@ -1,9 +1,9 @@
 POST http://localhost:3001/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlNwYXJ2MSIsImlkIjoiNjU0M2U5NjVmYmNmNzgyZmY1NjViNTE4IiwiaWF0IjoxNjk5Mjk2NDQ5fQ.9ojV5LXNdKrs-SumN3H7WETqX5Tzh-EFH3nefuL-gr4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlNwYXJ2MiIsImlkIjoiNjU0OTNhY2ZkNDMxM2VjYzJlZTg4ZWU4IiwiaWF0IjoxNjk5NzA3MTM3fQ.n0lT80qjI_jo3xjr3T8Wm7VbDa5PUik0wqg9Gp4Oxew
 
 {
-"author":"Arvid",
-"title":"With token monday 5",
+"author":"Anna",
+"title":"With token sat 1",
 "url":"testurl"
 }

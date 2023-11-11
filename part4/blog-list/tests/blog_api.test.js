@@ -3,6 +3,7 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const initialBlogs = [
   {
@@ -22,9 +23,20 @@ const initialBlogs = [
     __v: 0,
   },
 ]
+let headers
+
+beforeAll(async () => {
+  await User.deleteMany({})
+  const newUser = { user: 'test', username: 'test', password: 'test' }
+  const createdUser = await api.post('/api/users').send(newUser)
+  const loggedInUser = await api.post('/api/login').send(newUser)
+  headers = { Authorization: `Bearer ${loggedInUser.body.token}` }
+  initialBlogs.map((blog) => (blog.user = createdUser.body.id))
+})
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+
   let noteObject = new Blog(initialBlogs[0])
   await noteObject.save()
   noteObject = new Blog(initialBlogs[1])
@@ -66,7 +78,8 @@ describe('Addition of a blog', () => {
       url: 'https://en.wikipedia.org/wiki/The_Mythical_Man-Month',
       likes: 3,
     }
-    const response = await api.post('/api/blogs').send(newBlog)
+    const response = await api.post('/api/blogs').send(newBlog).set(headers)
+
     const newBlogContents = response.body
 
     const getRequest = await api.get('/api/blogs')
@@ -84,7 +97,7 @@ describe('Addition of a blog', () => {
       author: 'Anna',
       url: 'https://en.wikipedia.org/wiki/The_Mythical_Man-Month',
     }
-    const response = await api.post('/api/blogs').send(newBlog)
+    const response = await api.post('/api/blogs').send(newBlog).set(headers)
     const contents = response.body
     expect(contents.likes).toBe(0)
   }, 10000)
@@ -99,8 +112,18 @@ describe('Addition of a blog', () => {
       author: 'Anna',
     }
 
-    await api.post('/api/blogs').send(noTitle).expect(400)
-    await api.post('/api/blogs').send(noUrl).expect(400)
+    await api.post('/api/blogs').send(noTitle).expect(400).set(headers)
+    await api.post('/api/blogs').send(noUrl).expect(400).set(headers)
+  })
+
+  test('Fails with status code 401 if no token is provided', async () => {
+    const newBlog = {
+      title: 'No likes',
+      author: 'Anna',
+      url: 'https://en.wikipedia.org/wiki/The_Mythical_Man-Month',
+    }
+
+    await api.post('/api/blogs').send(newBlog).expect(401)
   })
 })
 
@@ -109,7 +132,7 @@ describe('Deletion of a blog', () => {
     const getResponse = await api.get('/api/blogs')
     const blogs = getResponse.body
     const lastBlog = blogs[blogs.length - 1]
-    await api.delete(`/api/blogs/${lastBlog.id}`).expect(200)
+    await api.delete(`/api/blogs/${lastBlog.id}`).expect(200).set(headers)
   })
 })
 
@@ -125,6 +148,7 @@ describe('Creation of a user', () => {
       .post('/api/users')
       .send(userWithShortUsername)
       .expect(400)
+      .set(headers)
     const contents = errorResponse.body
     expect(contents.error).toBe(
       'User validation failed: username: Path `username` (`Te`) is shorter than the minimum allowed length (3).'
@@ -140,10 +164,10 @@ describe('Creation of a user', () => {
       .post('/api/users')
       .send(userWithShortPassword)
       .expect(400)
+      .set(headers)
 
     const contents = errorResponse.body
 
-    //fortsätt här
     expect(contents.error).toBe('Password should have 3 letters or more')
   })
 })
